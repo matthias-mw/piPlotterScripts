@@ -26,7 +26,7 @@ urlButton3 = "http://tatooinepi:3333/d/-gsoO687z/sv-tatooine-remote?orgId=1&from
 tabButton3 = "SV Tatooine Remote"
 
 # Activate OpenCPN
-wndOCPNtitle = "OCPN"
+wndOpenCPNtitle = "OpenCPN"
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Function to focus on a given window and bring it in front
@@ -42,9 +42,10 @@ def focus_window_by_title(title_keyword):
                 window_id = line.split()[0]
                 subprocess.run(['wmctrl', '-ia', window_id])
                 print(f"Brought window to front: {line}")
-                return
+                return 1
 
         print(f"No window found with title containing: '{title_keyword}'")
+        return 0
 
     except Exception as e:
         print(f"Error: {e}")
@@ -58,6 +59,7 @@ GPIO.setup(18, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 GPIO.setup(16, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 GPIO.setup(15, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 GPIO.setup(13, GPIO.IN, pull_up_down = GPIO.PUD_UP)
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Active a certain Webbrowser Tab
@@ -119,7 +121,18 @@ while 1:
         # Wenn Eingang HIGH ist, Ausgabe im Terminal erzeugen
         print("Eingang 18 HIGH" )
 
+        if focus_window_by_title(wndOpenCPNtitle)== 0:
+            print("OpenCPN has not been started yet ....")
         time.sleep(1)
+
+
+
+
+
+
+
+
+
 
 
 
