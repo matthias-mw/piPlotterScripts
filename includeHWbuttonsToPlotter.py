@@ -3,6 +3,7 @@
 import RPi.GPIO as GPIO
 import webbrowser
 import time
+import asyncio
 import os
 from brotab.api import MultipleMediatorsAPI
 from brotab.main import create_clients
@@ -61,33 +62,38 @@ GPIO.setup(13, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Active a certain Webbrowser Tab
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+api = MultipleMediatorsAPI(create_clients())
 def select_tab(tab_title,url):
-    
-    api = MultipleMediatorsAPI(create_clients())
-    result = api.list_tabs([])
 
-    tabCnt = 0
-    for line in result:
-        print(line)
+    try:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        result = api.list_tabs([])
 
-        # Check for "tab_title" and extract the string before the first space
-        if tab_title in line:
-            tabID = line.split()[0]
-            tabCnt = tabCnt + 1
-            print(tab_title + " found.")
-            # Close if multible tabs were found
-            if tabCnt > 1:
-                result = api.close_tabs([tabID])
-                print("One Tab closed")
-            else:
-                result = api.activate_tab([tabID],True)
+        tabCnt = 0
+        for line in result:
+            print(line)
 
-    #If ther is no Open Anchow Watch tab
-    if tabCnt == 0:
-        webbrowser.open_new_tab(url)
+            # Check for "tab_title" and extract the string before the first space
+            if tab_title in line:
+                tabID = line.split()[0]
+                tabCnt = tabCnt + 1
+                print(tab_title + " found.")
+                # Close if multible tabs were found
+                if tabCnt > 1:
+                    result = api.close_tabs([tabID])
+                    print("One Tab closed")
+                else:
+                    result = api.activate_tab([tabID],True)
 
-    focus_window_by_title(tab_title)
-
+        #If ther is no Open Anchow Watch tab
+        if tabCnt == 0:
+            webbrowser.open_new_tab(url)
+            
+        time.sleep(1)
+        focus_window_by_title(tab_title)
+    except Exception as e:
+        print(f"Error: {e}")
+        
 # Endlosschleife
 while 1:
     
